@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The PokeGroup • SKU Catalog</title>
+  <meta name="description" content="The PokeGroup — consolidated Pokémon product/SKU catalog by retailer." />
+  <style>
+    :root{
+      --bg:#0c0a10;
+      --ink:#eef2ff;
+      --muted:#a9b0c2;
+      --card:#13111a;
+      --ring:#232030;
+      --brand:#8f79ff;  /* primary (violet) */
+      --accent:#a85bd6; /* secondary (purple) */
+      --radius:14px;
+      --pad:18px;
+      --gap:14px;
+      --shadow:0 10px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.02);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 800px at 20% 0%, rgba(168,91,214,.12), transparent 60%),
+        radial-gradient(900px 600px at 80% 100%, rgba(143,121,255,.10), transparent 60%),
+        linear-gradient(180deg,#0a0910,#0c0a10 40%, #0a0a12);
+      font:16px/1.55 system-ui, -apple-system, Segoe UI, Inter, Roboto, sans-serif;
+    }
+    .wrap{max-width:1100px;margin:auto;padding:28px 20px}
+    .nav{
+      display:flex;align-items:center;justify-content:space-between;margin-bottom:18px
+    }
+    .brand{
+      display:flex;gap:12px;align-items:center;font-weight:800;letter-spacing:.2px
+    }
+    .logo{
+      width:36px;height:36px;border-radius:10px;
+      background:
+        conic-gradient(from 180deg at 60% 40%, rgba(168,91,214,.5),rgba(143,121,255,.5)),
+        radial-gradient(20px 14px at 70% 40%, rgba(255,255,255,.25), transparent 60%),
+        linear-gradient(135deg,#2a2038,#1a1624);
+      box-shadow: var(--shadow);
+      position:relative;overflow:hidden;
+    }
+    /* faint “Gengar-y” silhouette shape (abstract, not a copy) */
+    .logo:before{
+      content:"";position:absolute;inset:0;
+      background:
+        radial-gradient(12px 8px at 25% 25%, rgba(255,255,255,.08), transparent 60%),
+        radial-gradient(9px 6px at 75% 30%, rgba(255,255,255,.06), transparent 60%),
+        radial-gradient(60% 60% at 50% 70%, rgba(168,91,214,.18), transparent 70%);
+      mix-blend-mode: screen;
+    }
+    .btn{
+      background:linear-gradient(90deg,var(--brand),var(--accent));
+      color:#0a0910;border:none;padding:10px 14px;border-radius:10px;
+      font-weight:800;cursor:pointer
+    }
+    .bar{
+      border:1px solid rgba(168,91,214,.35);
+      background:linear-gradient(180deg,rgba(168,91,214,.14),rgba(168,91,214,.08));
+      color:var(--ink); border-radius:12px;padding:10px 12px;text-align:center;
+      margin-bottom:18px
+    }
+    .hero{
+      display:grid;grid-template-columns:1.15fr .85fr;gap:22px;margin-bottom:26px
+    }
+    .card{
+      background:linear-gradient(180deg,#13111a,#0f0d16);
+      border:1px solid var(--ring);border-radius:var(--radius);padding:var(--pad);
+      box-shadow:var(--shadow)
+    }
+    h1{font-size:clamp(28px,4.5vw,44px);line-height:1.08;margin:.2em 0 .4em}
+    .muted{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gap)}
+    .col-4{grid-column:span 4}
+    .col-6{grid-column:span 6}
+    .col-12{grid-column:span 12}
+    .tile{
+      background:linear-gradient(180deg,#14121b,#110f18);
+      border:1px solid var(--ring);border-radius:12px;padding:16px;box-shadow:var(--shadow)
+    }
+    .group{
+      margin-top:26px
+    }
+    .group h2{margin:0 0 10px;font-size:22px}
+    details {
+      border:1px solid var(--ring);border-radius:12px;background:#12101a;
+      box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden
+    }
+    details[open]{background:#110f19}
+    summary{
+      list-style:none;padding:14px 16px;cursor:pointer;font-weight:700;
+      background:linear-gradient(90deg, rgba(143,121,255,.16), rgba(168,91,214,.16));
+      display:flex;align-items:center;justify-content:space-between
+    }
+    summary::-webkit-details-marker{display:none}
+    .list{margin:0;padding:14px 16px;padding-top:8px}
+    .list ul{margin:0;padding-left:18px}
+    .badge{
+      display:inline-block;margin-left:10px;
+      padding:3px 8px;border-radius:999px;font-size:.78rem;
+      background:rgba(143,121,255,.18);border:1px solid rgba(143,121,255,.35);color:var(--ink)
+    }
+    footer{margin:40px 0 16px;color:var(--muted);font-size:.9rem;text-align:center}
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr}
+      .col-4,.col-6{grid-column:span 12}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- top -->
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>The PokeGroup</div>
+      </div>
+      <a href="#join"><button class="btn">Join Discord</button></a>
+    </div>
+
+    <div class="bar">Heads up: weekend online restocks are uncommon; preorders can still pop. Watch the Discord announcements.</div>
+
+    <!-- hero -->
+    <section class="hero">
+      <div class="card">
+        <p class="muted" style="text-transform:uppercase;letter-spacing:.12em;font-size:.8rem">SKU Catalog</p>
+        <h1>All your Pokémon SKUs, grouped by retailer.</h1>
+        <p class="muted">Fast reference for ETBs, BBs, tins and promos. Use the expandable sections below to scan a retailer’s lineup at a glance.</p>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <a href="#retailers"><button class="btn">Browse Retailers</button></a>
+          <a href="#faq" class="muted" style="text-decoration:underline">FAQ</a>
+        </div>
+      </div>
+      <div class="card">
+        <!-- abstract art block (Gengar-vibes, not IP) -->
+        <div style="height:230px;border-radius:12px;background:
+          radial-gradient(120px 90px at 30% 35%, rgba(168,91,214,.25), transparent 60%),
+          radial-gradient(140px 100px at 70% 70%, rgba(143,121,255,.22), transparent 60%),
+          conic-gradient(from 220deg at 60% 40%, rgba(168,91,214,.12), rgba(143,121,255,.12), transparent 60%),
+          linear-gradient(180deg,#0f0d16,#0b0a12)"></div>
+        <p class="muted" style="margin-top:10px">Background uses gradients only—safe to publish and lightweight.</p>
+      </div>
+    </section>
+
+    <!-- feature callouts -->
+    <section class="grid">
+      <div class="col-4 tile">
+        <h3>Lightweight</h3>
+        <p class="muted">Plain HTML/CSS. No frameworks needed—instant deploy to Netlify or GitHub Pages.</p>
+      </div>
+      <div class="col-4 tile">
+        <h3>Clean Room</h3>
+        <p class="muted">New code, new class names, fresh copy. No lifted assets.</p>
+      </div>
+      <div class="col-4 tile">
+        <h3>Easy Edits</h3>
+        <p class="muted">Add/remove products by editing simple lists under each retailer.</p>
+      </div>
+    </section>
+
+    <!-- retailers -->
+    <section id="retailers" class="group">
+      <h2>Retailers</h2>
+
+      <!-- Best Buy -->
+      <details open>
+        <summary>Best Buy <span class="badge">sample</span></summary>
+        <div class="list">
+          <ul>
+            <li>BLACK BOLT — ETB</li>
+            <li>BLACK BOLT — Booster Box</li>
+            <li>BLACK BOLT — Binder Collection</li>
+            <li>WHITE FLARE — ETB</li>
+            <li>WHITE FLARE — Booster Box</li>
+            <li>DESTINED RIVALS — Booster Box (36)</li>
+            <li>DESTINED RIVALS — ETB</li>
+            <li>PRISMATIC EVOLUTIONS — ETB</li>
+            <li>PRISMATIC EVOLUTIONS — Booster Box</li>
+            <li>SURGING SPARKS — ETB</li>
+            <li>SURGING SPARKS — Sleeved Boosters</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Walmart -->
+      <details>
+        <summary>Walmart</summary>
+        <div class="list">
+          <ul>
+            <li>PRISMATIC EVOLUTIONS — Super Premium Collection</li>
+            <li>PRISMATIC EVOLUTIONS — Binder Collection</li>
+            <li>STELLAR CROWN — ETB</li>
+            <li>STELLAR CROWN — Booster Box (36)</li>
+            <li>SHROUDED FABLE — ETB</li>
+            <li>TWILIGHT MASQUERADE — 3-Pack Blister</li>
+            <li>TEMPORAL FORCES — ETB (Walking Wake)</li>
+            <li>PALDEAN FATES — ETB</li>
+            <li>PARADOX RIFT — 3-Pack Blister (Cetitan)</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- GameStop -->
+      <details>
+        <summary>GameStop</summary>
+        <div class="list">
+          <ul>
+            <li>DESTINED RIVALS — Cynthia’s Garchomp EX Premium Collection</li>
+            <li>JOURNEY TOGETHER — Lillie Premium Tournament Collection</li>
+            <li>151 — Ultra Premium Box</li>
+            <li>OBSIDIAN FLAMES — ETB</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Dollar General -->
+      <details>
+        <summary>Dollar General</summary>
+        <div class="list">
+          <ul>
+            <li>Mini Tins (assorted waves)</li>
+            <li>Checklane Blisters</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Costco -->
+      <details>
+        <summary>Costco</summary>
+        <div class="list">
+          <ul>
+            <li>Prismatic Evolutions — 8-Pack Mini Tin Bundle</li>
+            <li>Figure/Stack Bundles (seasonal)</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Sam's Club -->
+      <details>
+        <summary>Sam’s Club</summary>
+        <div class="list">
+          <ul>
+            <li>Lucario / Tyranitar Box (seasonal)</li>
+            <li>Stacking Tins (Q1/Q4 rotations)</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="group">
+      <h2>FAQ</h2>
+      <div class="tile">
+        <details open>
+          <summary>Can I copy this file to another host?</summary>
+          <div class="list"><p class="muted">Yes. It’s plain HTML/CSS. Drag-and-drop to Netlify Drop or push to GitHub Pages.</p></div>
+        </details>
+        <details>
+          <summary>Where do I add SKUs?</summary>
+          <div class="list"><p class="muted">Edit the `<ul>` under each `<details>` block. You can create more retailers by duplicating a block and changing the `<summary>`.</p></div>
+        </details>
+        <details>
+          <summary>Can you theme it differently (e.g., different mascot)?</summary>
+          <div class="list"><p class="muted">Totally. I used a neutral purple “spectral” theme. If you prefer a different vibe (e.g., teal/black, or a moonlit blue), I can swap the gradients in minutes.</p></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Join -->
+    <section id="join" class="card" style="margin-top:26px;text-align:center">
+      <h2>Join The PokeGroup Discord</h2>
+      <p class="muted">Live monitors for Pokémon Center, Target, Walmart, Costco, and more.</p>
+      <a class="btn" href="#" aria-label="Join Discord">Join Now</a>
+    </section>
+
+    <footer>© <span id="y"></span> The PokeGroup • Not affiliated with The Pokémon Company.</footer>
+  </div>
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
