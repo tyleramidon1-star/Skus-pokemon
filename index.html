@@ -1,635 +1,681 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>The PokeGroup • SKU Catalog</title>
-  <meta name="description" content="The PokeGroup — click any product to copy its SKU or link." />
-  <style>
-    :root{
-      --ink:#eef2ff; --muted:#b9c0cf;
-      --ring:#2a3142; --card:#101826; --card2:#0c1422;
-      --brand:#8f79ff; --accent:#a85bd6;
-      --radius:14px; --pad:18px; --gap:14px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; color:var(--ink);
-      font:16px/1.55 system-ui, Segoe UI, Inter, Roboto, -apple-system, sans-serif;
-      background:#0a0e16;
-      min-height:100dvh;
-    }
-    /* background image with gradient veil for readability */
-    .bg{
-      position:fixed; inset:0; z-index:-2;
-      background:url('background.jpg') center/cover no-repeat fixed;
-      filter:saturate(1.05) contrast(1.02) brightness(.9);
-    }
-    .veil{
-      position:fixed; inset:0; z-index:-1;
-      background:
-        radial-gradient(1200px 800px at 20% 20%, rgba(22,8,42,.55), transparent 60%),
-        radial-gradient(1200px 800px at 80% 80%, rgba(4,18,44,.55), transparent 60%),
-        rgba(6,10,18,.60); /* main dark veil */
-      backdrop-filter: blur(2px);
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The PokeGroup • SKU Catalog</title>
+<meta name="description" content="The PokeGroup — click any product to copy its SKU or link." />
+<style>
+  :root{
+    --ink:#eef2ff; --muted:#b9c0cf;
+    --ring:#293246; --card:#0e1524; --card2:#0b1220;
+    --brand:#8f79ff; --accent:#a85bd6; --accent2:#66e0ff;
+    --radius:16px; --pad:18px; --gap:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; color:var(--ink);
+    font:16px/1.55 system-ui,Segoe UI,Inter,Roboto,-apple-system,sans-serif;
+    background:#090e16; overflow-x:hidden;
+  }
 
-    .wrap{max-width:1100px;margin:auto;padding:28px 20px}
-    .nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-    .brand{display:flex;gap:12px;align-items:center;font-weight:800}
-    .brand img{width:44px;height:44px;border-radius:10px;object-fit:cover}
-    .btn{
-      background:linear-gradient(90deg,var(--brand),var(--accent));
-      color:#0a0e14; border:none; padding:10px 14px;
-      border-radius:12px; font-weight:800; cursor:pointer; text-decoration:none
-    }
+  /* ===== Background: Charizard + cinematic veil + parallax ===== */
+  .bg, .veil, .glow{position:fixed; inset:0; pointer-events:none}
+  .bg{
+    z-index:-3;
+    background-image:url('background.jpg');
+    background-size:cover; background-position:50% 20%; background-attachment:fixed;
+    transform:translateZ(0);
+    filter:saturate(1.08) contrast(1.02) brightness(.95);
+  }
+  .veil{
+    z-index:-2;
+    background:
+      radial-gradient(1200px 800px at 20% 25%, rgba(23,10,50,.55), transparent 60%),
+      radial-gradient(1200px 800px at 85% 80%, rgba(6,24,58,.55), transparent 60%),
+      linear-gradient(180deg, rgba(9,12,20,.55) 0%, rgba(9,12,20,.75) 100%);
+    backdrop-filter: blur(2px);
+  }
+  .glow{
+    z-index:-1;
+    background:
+      radial-gradient(900px 500px at 15% 15%, rgba(168,91,214,.22), transparent 60%),
+      radial-gradient(900px 500px at 85% 85%, rgba(102,224,255,.16), transparent 60%);
+    mix-blend-mode:screen;
+  }
 
-    .card{
-      background:linear-gradient(180deg, rgba(16,24,38,.92), rgba(12,20,34,.92));
-      border:1px solid var(--ring); border-radius:var(--radius); padding:var(--pad);
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
-    }
-    .muted{color:var(--muted)}
+  /* ===== Layout: sidebar + content ===== */
+  .page{display:grid; grid-template-columns: 320px 1fr; gap:22px; min-height:100vh; padding:24px}
+  @media (max-width: 980px){
+    .page{grid-template-columns: 1fr; padding:18px}
+  }
 
-    /* search */
-    .toolbar{display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap}
-    .search{
-      flex:1 1 320px; background:#0d1524; color:var(--ink);
-      border:1px solid var(--ring); border-radius:10px; padding:10px 12px;
-      outline:none;
-    }
+  /* ===== Sidebar ===== */
+  .side{
+    position:sticky; top:18px; align-self:start;
+    background:linear-gradient(180deg, rgba(14,21,36,.95), rgba(10,17,30,.95));
+    border:1px solid var(--ring); border-radius:20px; padding:22px;
+    box-shadow:0 14px 40px rgba(0,0,0,.35);
+  }
+  .brand{
+    display:flex; gap:14px; align-items:center; margin-bottom:14px
+  }
+  .brand img{
+    width:76px; height:76px; border-radius:16px; object-fit:cover;
+    box-shadow:0 0 0 3px rgba(10,14,20,.55), 0 10px 24px rgba(0,0,0,.35);
+    background:rgba(255,255,255,.06)
+  }
+  .brand h1{font-size:clamp(22px,3.6vw,28px); margin:0}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    background:linear-gradient(90deg,var(--brand),var(--accent));
+    color:#0a0e14; border:none; padding:14px 16px;
+    border-radius:14px; font-weight:900; text-decoration:none; width:100%;
+    box-shadow:0 8px 24px rgba(120,90,255,.25);
+    margin:10px 0 4px 0;
+  }
+  .btn svg{width:22px;height:22px}
+  .side p{color:var(--muted); margin-top:10px; margin-bottom:0; font-size:14px}
 
-    /* sections */
-    .group{margin-top:26px}
-    details{
-      border:1px solid var(--ring); border-radius:12px;
-      background:linear-gradient(180deg, rgba(18,26,40,.9), rgba(14,22,36,.9));
-      margin-bottom:12px; overflow:hidden
-    }
-    summary{
-      list-style:none; padding:14px 16px; cursor:pointer; font-weight:800;
-      background:linear-gradient(90deg, rgba(143,121,255,.18), rgba(168,91,214,.18));
-    }
-    summary::-webkit-details-marker{display:none}
-    .list{display:grid; gap:8px; padding:12px 14px}
-    .sku{
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-      background:linear-gradient(180deg,#111926,#0f1520);
-      border:1px solid var(--ring); border-radius:10px; padding:10px 12px; cursor:pointer
-    }
-    .sku:hover{outline:2px solid rgba(168,91,214,.35)}
-    .sku .name{font-weight:600}
-    .sku .code{color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-    .sku.pending{opacity:.55; cursor:not-allowed}
-    .sku.pending .code{color:#8b90a2}
+  /* ===== Content ===== */
+  .card{
+    background:linear-gradient(180deg, rgba(16,24,40,.92), rgba(12,20,34,.92));
+    border:1px solid var(--ring); border-radius:20px; padding:var(--pad);
+    box-shadow:0 12px 36px rgba(0,0,0,.28);
+  }
+  .toolbar{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:8px}
+  .search{
+    flex:1 1 320px; background:#0d1526; color:var(--ink);
+    border:1px solid var(--ring); border-radius:12px; padding:12px 14px; outline:none;
+  }
+  .hint{color:var(--muted); font-size:14px}
 
-    /* toast */
-    .toast{
-      position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(20px);
-      background:#0f1520; border:1px solid var(--ring); color:var(--ink);
-      padding:10px 14px; border-radius:10px; opacity:0; pointer-events:none; transition:.25s
-    }
-    .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
-  </style>
+  .group{margin-top:18px}
+  details{
+    border:1px solid var(--ring); border-radius:14px;
+    background:linear-gradient(180deg, rgba(18,26,42,.9), rgba(14,22,36,.9));
+    margin-bottom:12px; overflow:hidden
+  }
+  summary{
+    list-style:none; padding:14px 16px; cursor:pointer; font-weight:900;
+    display:flex; align-items:center; justify-content:space-between;
+    background:linear-gradient(90deg, rgba(143,121,255,.22), rgba(168,91,214,.16), rgba(102,224,255,.14));
+  }
+  summary::-webkit-details-marker{display:none}
+  .badge{
+    display:inline-block; font:600 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    color:#0a1120; background:linear-gradient(90deg,#a85bd6,#66e0ff);
+    padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.15)
+  }
+  .list{display:grid; gap:8px; padding:12px 14px}
+  .sku{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    background:linear-gradient(180deg,#111926,#0f1520);
+    border:1px solid var(--ring); border-radius:12px; padding:12px 14px; cursor:pointer
+  }
+  .sku:hover{outline:2px solid rgba(168,91,214,.35)}
+  .name{font-weight:700}
+  .code{color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .sku.pending{opacity:.55; cursor:not-allowed}
+  .sku.pending .code{color:#8b90a2}
+
+  /* Toast */
+  .toast{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(20px);
+    background:#0f1520; border:1px solid var(--ring); color:var(--ink);
+    padding:12px 16px; border-radius:12px; opacity:0; pointer-events:none; transition:.25s;
+    box-shadow:0 8px 26px rgba(0,0,0,.25)
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
 </head>
 <body>
-  <div class="bg"></div>
-  <div class="veil"></div>
+  <div class="bg" aria-hidden="true"></div>
+  <div class="veil" aria-hidden="true"></div>
+  <div class="glow" aria-hidden="true"></div>
 
-  <div class="wrap">
-    <div class="nav">
+  <main class="page">
+    <!-- ===== Left Sidebar ===== -->
+    <aside class="side">
       <div class="brand">
-        <img src="pgrm-logo.png" alt="PGRM logo">
-        <div>The PokeGroup</div>
+        <img src="pgrm-logo.png" alt="The PokeGroup logo">
+        <h1>The PokeGroup</h1>
       </div>
-      <a class="btn" href="https://discord.gg/k38bQDgBmT" target="_blank" rel="noopener">Join Discord</a>
-    </div>
+      <a class="btn" href="https://discord.gg/k38bQDgBmT" target="_blank" rel="noopener" aria-label="Join The PokeGroup Discord">
+        <!-- Discord icon -->
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.369A19.791 19.791 0 0 0 16.847 3c-.2.353-.43.83-.59 1.205a18.27 18.27 0 0 0-4.514 0C11.983 3.83 11.754 3.353 11.553 3a19.736 19.736 0 0 0-3.47 1.369C4.915 7.197 4.17 9.94 4.4 12.64c1.293 1.006 2.546 1.62 3.787 2.02a9.1 9.1 0 0 0 .666-1.125c-1.1-.416-2.154-1.01-3.054-1.85.257.19.664.455 1.046.655 3.2 1.626 6.66 1.626 9.83 0 .382-.2.79-.466 1.046-.655-.9.84-1.95 1.433-3.05 1.85.19.39.43.79.67 1.125 1.24-.4 2.49-1.014 3.78-2.02.31-3.38-.53-6.095-3.28-8.27zM9.75 12.5c-.72 0-1.31-.67-1.31-1.5s.58-1.5 1.31-1.5 1.31.67 1.31 1.5-.59 1.5-1.31 1.5zm4.5 0c-.72 0-1.31-.67-1.31-1.5s.58-1.5 1.31-1.5 1.31.67 1.31 1.5-.59 1.5-1.31 1.5z"/></svg>
+        Join Discord
+      </a>
+      <p>Click any item on the right to copy its SKU. Costco & Sam’s copy their product link.</p>
+    </aside>
 
-    <section class="card">
-      <h1>Click any item to copy its SKU (or link).</h1>
-      <p class="muted">Prefixes removed as requested. Costco & Sam’s copy the product link.</p>
-
-      <div class="toolbar">
-        <input class="search" id="search" placeholder="Search items or stores… (e.g., charizard, best buy, ETB)">
+    <!-- ===== Right Content ===== -->
+    <section>
+      <div class="card">
+        <div class="toolbar">
+          <input class="search" id="search" placeholder="Search items or stores… (e.g., charizard, ETB, best buy)">
+          <div class="hint">Tip: press <b>Ctrl/⌘+F</b> for browser search too.</div>
+        </div>
       </div>
+      <div id="retailers" class="group"></div>
     </section>
+  </main>
 
-    <section id="retailers" class="group"></section>
-    <div id="toast" class="toast" role="status" aria-live="polite">Copied!</div>
-  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite">Copied!</div>
 
-  <script>
-  // ====== DATA ===============================================================
-  // name: visible label; value: what gets copied; pending?: disables copy
-  const DATA = [
-    {
-      store: "Best Buy",
-      items: [
-        {name:"Mega Charizard X EX UPC", value:"6644581"},
-        {name:"PHANTASMAL FLAMES Booster Box 36 pack", value:"6644581"},
-        {name:"PHANTASMAL FLAMES ETB", value:"6645345"},
-        {name:"PHANTASMAL FLAMES BB", value:"6645343"},
-        {name:"PHANTASMAL FLAMES 3 pack blister", value:"6645342"},
-        {name:"PHANTASMAL FLAMES sleeved booster", value:"6645340"},
-        {name:"MEGA EVOLUTIONS Booster Box 36 pack", value:"6639109"},
-        {name:"MEGA EVOLUTIONS ETB", value:"6639103"},
-        {name:"MEGA EVOLUTIONS BB", value:"6639108"},
-        {name:"MEGA EVOLUTIONS 3 pack blister", value:"6639101"},
-        {name:"MEGA EVOLUTIONS sleeved booster", value:"6639110"},
-        {name:"Mega Heroes mini tins", value:"6639102"},
-        {name:"BLACK BOLT ETB", value:"6632397"},
-        {name:"BLACK BOLT BB", value:"6632402"},
-        {name:"BLACK BOLT Binder coll.", value:"6632388"},
-        {name:"BLACK BOLT Tech Sticker (Reuniclus) 3 pack", value:"6632393"},
-        {name:"BLACK/WHITE Unova Victini Illustration coll.", value:"6632391"},
-        {name:"BLACK BOLT/WHITE FLARE Unova mini tins", value:"6632392"},
-        {name:"WHITE FLARE ETB", value:"6632394"},
-        {name:"WHITE FLARE BB", value:"6632399"},
-        {name:"WHITE FLARE Binder coll.", value:"6632390"},
-        {name:"WHITE FLARE Tech Sticker (Gothitelle) 3 pack", value:"6632395"},
-        {name:"BLACK/WHITE Unova Poster coll.", value:"6632400"},
-        {name:"DESTINED RIVALS Booster Box 36 pack", value:"6624826"},
-        {name:"DESTINED RIVALS ETB", value:"6624825"},
-        {name:"DESTINED RIVALS BB", value:"6624828"},
-        {name:"DESTINED RIVALS Cynthia's Garchomp EX Premium coll.", value:"6625124"},
-        {name:"DESTINED RIVALS Team Rocket's Mewtwo EX Box", value:"6625125"},
-        {name:"DESTINED RIVALS 3 pack blister", value:"6624830"},
-        {name:"DESTINED RIVALS sleeved booster", value:"6624827"},
-        {name:"JOURNEY TOGETHER Booster Box 36 pack", value:"6614262"},
-        {name:"JOURNEY TOGETHER ETB", value:"6614267"},
-        {name:"JOURNEY TOGETHER Lillie Premium Tournament coll.", value:"6614267"},
-        {name:"JOURNEY TOGETHER BB", value:"6614264"},
-        {name:"JOURNEY TOGETHER Hop's Zacian EX Box", value:"6614261"},
-        {name:"JOURNEY TOGETHER 3 pack blister", value:"6614260"},
-        {name:"JOURNEY TOGETHER sleeved booster", value:"6614259"},
-        {name:"PRISMATIC EVOLUTIONS SPC", value:"6621081"},
-        {name:"PRISMATIC EVOLUTIONS Premium Figure Collection", value:"6639107"},
-        {name:"PRISMATIC EVOLUTIONS ETB", value:"6606082"},
-        {name:"PRISMATIC EVOLUTIONS Binder coll.", value:"6606079"},
-        {name:"PRISMATIC EVOLUTIONS BB", value:"6608206"},
-        {name:"PRISMATIC EVOLUTIONS Surprise Box", value:"6607717"},
-        {name:"PRISMATIC EVOLUTIONS Poster coll.", value:"6606080"},
-        {name:"PRISMATIC EVOLUTIONS Accessory Pouch Spec coll.", value:"6609202"},
-        {name:"PRISMATIC EVOLUTIONS Tech Sticker 3 pack", value:"6606078"},
-        {name:"PRISMATIC EVOLUTIONS 2 pack blister", value:"6607716"},
-        {name:"PRISMATIC EVOLUTIONS mini tins", value:"6607719"},
-        {name:"SURGING SPARKS Booster Box 36 pack", value:"6598558"},
-        {name:"SURGING SPARKS ETB", value:"6598557"},
-        {name:"SURGING SPARKS BB", value:"6598561"},
-        {name:"SURGING SPARKS 3 pack blister", value:"6598559"},
-        {name:"SURGING SPARKS sleeved boosters", value:"6598560"},
-        {name:"STELLAR CROWN ETB", value:"6588400"},
-        {name:"STELLAR CROWN 3 pack blister", value:"6588398"},
-        {name:"STELLAR CROWN sleeved boosters", value:"6588401"},
-        {name:"SHROUDED FABLE ETB", value:"6584431"},
-        {name:"SHROUDED FABLE BB", value:"6584432"},
-        {name:"SHROUDED FABLE 3 pack blister", value:"6584429"},
-        {name:"SHROUDED FABLE mini tins", value:"6584426"},
-        {name:"TWILIGHT MASQUERADE Booster Box 36 pack", value:"6578901"},
-        {name:"TWILIGHT MASQUERADE ETB", value:"6578904"},
-        {name:"TWILIGHT MASQUERADE sleeved boosters", value:"6578902"},
-        {name:"TEMPORAL FORCES Booster Box 36 pack", value:"6571897"},
-        {name:"TEMPORAL FORCES ETB", value:"6571900"},
-        {name:"TEMPORAL FORCES 3 pack blister (Cyclizar/Cleffa)", value:"6571899"},
-        {name:"TEMPORAL FORCES sleeved boosters", value:"6571896"},
-        {name:"PALDEAN FATES ETB", value:"6568010"},
-        {name:"PALDEAN FATES BB", value:"6568006"},
-        {name:"PARADOX RIFT ETB", value:"6557811"},
-        {name:"PARADOX RIFT 3 pack blister", value:"6557808"},
-        {name:"PARADOX RIFT sleeved boosters", value:"6557810"},
-        {name:"151 ETB", value:"6548366"},
-        {name:"151 BB", value:"6548371"},
-        {name:"151 Alakazam EX coll.", value:"6548368"},
-        {name:"151 Zapdos EX coll.", value:"6548370"},
-        {name:"OBSIDIAN FLAMES ETB", value:"6546727"},
-        {name:"OBSIDIAN FLAMES BB", value:"6546727"},
-        {name:"PALDEA EVOLVED ETB", value:"6540127"},
-        {name:"PALDEA EVOLVED BB", value:"6540131"},
-        {name:"PALDEA EVOLVED sleeved booster", value:"6540134"},
-        {name:"SCARLET & VIOLET ETB", value:"6531749"},
-        {name:"SCARLET & VIOLET 3 pack blister", value:"6531751"},
-        {name:"SCARLET & VIOLET sleeved boosters", value:"6531831"},
-        {name:"Mega Latias EX Box", value:"6640836"},
-        {name:"Mega Kangaskhan EX Box", value:"6644579"},
-        {name:"Hydreigon EX & Dragapult EX Premium Collection", value:"6640834"},
-        {name:"Paradox Clash Tins", value:"6578474"},
-        {name:"Azure Legends Tins", value:"6610888"},
-        {name:"Paldea Partners Tin", value:"6548382"},
-        {name:"Vibrant Paldea Mini Tins", value:"6579413"},
-        {name:"Stacking Tins (Q1 2025)", value:"6598560"},
-        {name:"Roaring Moon/Iron Valiant EX Box", value:"6560117"},
-        {name:"Oinkologne EX Box", value:"6549867"},
-        {name:"Grafaiai EX Box", value:"6573891"},
-        {name:"Mega Lucario EX Figure Collection", value:"6643670"},
-        {name:"Mega Venusaur EX Premium Collection", value:"6644577"},
-        {name:"Team Rocket Tins", value:"6637037"},
-        {name:"Slashing Legends Tins", value:"6621083"},
-        {name:"Paradox Destinies Tin", value:"6621083"},
-        {name:"Paldea Legends Tin", value:"6540129"},
-        {name:"Poke Ball Tins (Q4 2024)", value:"6540129"},
-        {name:"Mabosstiff EX Box", value:"6569192"},
-        {name:"Palafin EX Box", value:"6580252"},
-        {name:"Houndstone EX Box", value:"6590380"},
-        {name:"Bloodmoon Ursaluna EX Box", value:"6599407"},
-        {name:"Paldea Adventure Chest", value:"6569653"},
-      ]
-    },
-    {
-      store: "Walmart",
-      items: [
-        {name:"MEGA EVOLUTIONS ETB", value:"17328862239"},
-        {name:"MEGA EVOLUTIONS BB", value:"17344505131"},
-        {name:"MEGA EVOLUTIONS Build & Battle", value:"17269516415"},
-        {name:"MEGA EVOLUTIONS 3 pack blister", value:"17515901587"},
-        {name:"MEGA EVOLUTIONS sleeved booster", value:"17344605256"},
-        {name:"BLACK BOLT ETB", value:"16498668973"},
-        {name:"BLACK BOLT BB", value:"16484003729"},
-        {name:"BLACK BOLT Binder coll.", value:"16448166601"},
-        {name:"BLACK BOLT Tech Sticker (Reuniclus) 3 pack", value:"16448166601"},
-        {name:"BLACK/WHITE Unova Victini Illustration coll.", value:"16454274271"},
-        {name:"BLACK BOLT/WHITE FLARE Unova mini tins", value:"16800072727"},
-        {name:"WHITE FLARE ETB", value:"16446322202"},
-        {name:"WHITE FLARE BB", value:"16516160047"},
-        {name:"WHITE FLARE Binder coll.", value:"16516160046"},
-        {name:"WHITE FLARE Tech Sticker (Gothitelle) 3 pack", value:"16448166186"},
-        {name:"BLACK/WHITE Unova Poster coll.", value:"16517213276"},
-        {name:"DESTINED RIVALS Booster Box 36 pack", value:"15762118882"},
-        {name:"DESTINED RIVALS ETB", value:"15718673510"},
-        {name:"DESTINED RIVALS BB", value:"15700422581"},
-        {name:"DESTINED RIVALS Cynthia's Garchomp EX Premium coll.", value:"16036963618"},
-        {name:"DESTINED RIVALS Team Rocket's Mewtwo EX Box", value:"15992924968"},
-        {name:"DESTINED RIVALS 3 pack blister", value:"16060605120"},
-        {name:"DESTINED RIVALS sleeved boosters", value:"16034470614"},
-        {name:"JOURNEY TOGETHER ETB", value:"15156564532"},
-        {name:"JOURNEY TOGETHER Iono's Bellibolt EX Premium coll.", value:"15382923523"},
-        {name:"JOURNEY TOGETHER BB", value:"15042474261"},
-        {name:"JOURNEY TOGETHER 3 pack blister", value:"15118973121"},
-        {name:"JOURNEY TOGETHER checklane blister (?)", value:"15127073643"},
-        {name:"JOURNEY TOGETHER sleeved boosters", value:"15153417617"},
-        {name:"PRISMATIC EVOLUTIONS Super-Premium coll.", value:"15494520186"},
-        {name:"PRISMATIC EVOLUTIONS ETB", value:"13816151308"},
-        {name:"PRISMATIC EVOLUTIONS BB", value:"14803962651"},
-        {name:"PRISMATIC EVOLUTIONS Accessory Pouch Special coll.", value:"14169661774"},
-        {name:"PRISMATIC EVOLUTIONS Binder coll.", value:"14078321300"},
-        {name:"PRISMATIC EVOLUTIONS Poster coll.", value:"14091452016"},
-        {name:"PRISMATIC EVOLUTIONS Glaceon Tech Sticker 3 pack", value:"14885471059"},
-        {name:"PRISMATIC EVOLUTIONS Leafeon Tech Sticker 3 pack", value:"14904152274"},
-        {name:"PRISMATIC EVOLUTIONS Sylveon Tech Sticker 3 pack", value:"14862473632"},
-        {name:"PRISMATIC EVOLUTIONS 2 pack blister", value:"14764973846"},
-        {name:"PRISMATIC EVOLUTIONS mini tins", value:"11255406228"},
-        {name:"SURGING SPARKS ETB", value:"10692607747"},
-        {name:"SURGING SPARKS BB", value:"10692754252"},
-        {name:"SURGING SPARKS 3 pack boosters", value:"13793261801"},
-        {name:"SURGING SPARKS sleeved boosters", value:"12603711388"},
-        {name:"STELLAR CROWN Booster Box 36 pack", value:"8867673598"},
-        {name:"STELLAR CROWN ETB", value:"7762615377"},
-        {name:"STELLAR CROWN BB", value:"7778210362"},
-        {name:"STELLAR CROWN 3 pack boosters (Tinkaton)", value:"9323301769"},
-        {name:"STELLAR CROWN 3 pack boosters (Latias)", value:"11226954497"},
-        {name:"STELLAR CROWN sleeved boosters", value:"9310572859"},
-        {name:"SHROUDED FABLE ETB", value:"5977297380"},
-        {name:"SHROUDED FABLE BB", value:"5988933729"},
-        {name:"SHROUDED FABLE 3 pack blister (Pecharunt)", value:"7559459632"},
-        {name:"SHROUDED FABLE Kingdra EX Box", value:"8483260041"},
-        {name:"TWILIGHT MASQUERADE ETB", value:"5558569421"},
-        {name:"TWILIGHT MASQUERADE BB", value:"5511020275"},
-        {name:"TWILIGHT MASQUERADE 3 pack blister (Revavroom)", value:"5679588917"},
-        {name:"TWILIGHT MASQUERADE 3 pack blister (Snorlax)", value:"5676427231"},
-        {name:"TEMPORAL FORCES ETB (Walking Wake)", value:"5493766253"},
-        {name:"TEMPORAL FORCES ETB (Iron Leaves)", value:"5418357408"},
-        {name:"TEMPORAL FORCES BB", value:"5418357413"},
-        {name:"TEMPORAL FORCES 3 pack blister (Cleffa)", value:"5337897627"},
-        {name:"TEMPORAL FORCES 3 pack blister (Cyclizar)", value:"5347596968"},
-        {name:"PALDEAN FATES ETB", value:"5226743070"},
-        {name:"PALDEAN FATES BB", value:"5226743077"},
-        {name:"PALDEAN FATES Shiny Charizard Tin", value:"5385006261"},
-        {name:"PALDEAN FATES Iron Treads Tin", value:"5369461027"},
-        {name:"PALDEAN FATES EX Premium coll. (Quaquaval)", value:"5296781892"},
-        {name:"PALDEAN FATES EX Premium coll. (Meowscarada)", value:"5296781894"},
-        {name:"PALDEAN FATES EX Premium coll. (Skeledirge)", value:"5296781893"},
-        {name:"PALDEAN FATES mini tins", value:"5226743068"},
-        {name:"PARADOX RIFT ETB", value:"5046453045"},
-        {name:"PARADOX RIFT BB", value:"5089154509"},
-        {name:"PARADOX RIFT 3 pack blister (Cetitan)", value:"5046100011"},
-        {name:"PARADOX RIFT 3 pack blister (Arctibax)", value:"5113125909"},
-        {name:"151 Ultra Premium Box", value:"3100716488"},
-        {name:"151 Mini Tins Box Set", value:"16522474508"},
-        {name:"151 ETB", value:"3417089291"},
-        {name:"151 Binder coll.", value:"3006269158"},
-        {name:"151 BB", value:"1160437186"},
-        {name:"151 Zapdos EX coll.", value:"3534446787"},
-        {name:"151 Alakazam EX coll.", value:"2555285136"},
-        {name:"151 Poster coll.", value:"2121361619"},
-        {name:"151 mini tins", value:"3034232830"},
-        {name:"OBSIDIAN FLAMES ETB", value:"3280189864"},
-        {name:"OBSIDIAN FLAMES BB", value:"1722511419"},
-        {name:"OBSIDIAN FLAMES 3 pack blister", value:"2214595737"},
-        {name:"OBSIDIAN FLAMES checklane blister", value:"2607430881"},
-        {name:"PALDEA EVOLVED ETB", value:"3593531801"},
-        {name:"PALDEA EVOLVED BB", value:"1035833722"},
-        {name:"PALDEA EVOLVED 3 pack blister (Varoom)", value:"2374086635"},
-        {name:"SCARLET & VIOLET ETB Koraidon or Miraidon", value:"2668346140"},
-        {name:"SCARLET & VIOLET BB", value:"1481496681"},
-        {name:"Team Rocket Tins", value:"17577710710"},
-        {name:"Charizard EX SPC", value:"8177053453"},
-        {name:"Annihilape EX coll. Box", value:"3690005912"},
-        {name:"Azure Legends Tin", value:"15024524281"},
-        {name:"Paradox Destinies (Iron Crown)", value:"11227263141"},
-        {name:"Paradox Destinies (Iron Boulder)", value:"11247660599"},
-        {name:"Paradox Destinies (Gouging Fire)", value:"11233258311"},
-        {name:"Paradox Destinies (Raging Bolt)", value:"11227313344"},
-        {name:"Paradox Clash Tin (Walking Wake)", value:"5909414034"},
-        {name:"Paradox Clash Tin (Iron Leaves)", value:"5668636817"},
-        {name:"Armarouge EX Prem. coll.", value:"5378390855"},
-        {name:"Grafaiai EX Box", value:"5418257351"},
-        {name:"Roaring Moon/Iron Valiant EX Box", value:"5038633155"},
-        {name:"Legendary Warriors Premium coll.", value:"13190955834"},
-        {name:"Pikachu VMax Premium coll.", value:"1668497356"},
-        {name:"Crown Zenith Regieleki V / Regidrago V coll.", value:"2036332917"},
-        {name:"Fall Collectors Chest 2023 (Charizard)", value:"5038633157"},
-        {name:"Slashing Legends Tin", value:"15840514011"},
-        {name:"Origin Forme Dialga/Palkia Vstar Premium Collection", value:"2922306172"},
-        {name:"Terapagos EX UPC", value:"9745761686"},
-        {name:"Paldea Partners Tin (Quaquaval)", value:"3459510704"},
-        {name:"Paldea Partners Tin (Meowscarada)", value:"1493426135"},
-        {name:"Paldea Partners Tin (Skeledirge)", value:"3224359179"},
-        {name:"Paldea Legends Tin (Koraidon)", value:"1676168797"},
-        {name:"Paldea Legends Tin (Miraidon)", value:"1535242851"},
-        {name:"Grand Adventure coll.", value:"10681771578"},
-        {name:"Hop's Zacian EX Box", value:"15186456025"},
-        {name:"Cyclizar EX Box", value:"1796628871"},
-        {name:"Ogerpon EX Prem. coll.", value:"12616660824"},
-        {name:"Tyranitar EX Prem. coll.", value:"5301432142"},
-        {name:"Palafin EX Box", value:"5681039742"},
-        {name:"Stacking Tin 2025 Q1 (Ogerpon/Paradox/Treasures)", value:"15113272854"},
-        {name:"Crown Zenith Tin", value:"1750362014"},
-        {name:"Lucario VStar Premium coll.", value:"358343864"},
-        {name:"Mystery Power Box - 5 packs", value:"2348412263"},
-        {name:"Fall Collectors Chest 2024 (Pikachu)", value:"13587262907"},
-      ]
-    },
-    {
-      store: "GameStop",
-      items: [
-        {name:"MEGA EVOLUTIONS Booster Box 36 pack", value:"428257"},
-        {name:"MEGA EVOLUTIONS ETB", value:"428260"},
-        {name:"MEGA EVOLUTIONS BB", value:"428265"},
-        {name:"MEGA EVOLUTIONS Build & Battle", value:"428265"},
-        {name:"MEGA EVOLUTIONS 3 pack blister", value:"428269"},
-        {name:"MEGA EVOLUTIONS checklane blister (SKU pending)", value:"", pending:true},
-        {name:"MEGA EVOLUTIONS sleeved booster (SKU pending)", value:"", pending:true},
-        {name:"Mega Heroes mini tins", value:"428270"},
-        {name:"BLACK BOLT ETB", value:"426102"},
-        {name:"BLACK BOLT BB", value:"426122"},
-        {name:"BLACK BOLT Binder coll.", value:"426104"},
-        {name:"BLACK BOLT Tech Sticker (Reuniclus) 3 pack", value:"426119"},
-        {name:"BLACK/WHITE Unova Victini Illustration coll.", value:"426121"},
-        {name:"BLACK BOLT/WHITE FLARE Unova mini tins", value:"426112"},
-        {name:"WHITE FLARE ETB", value:"426103"},
-        {name:"WHITE FLARE BB", value:"426123"},
-        {name:"WHITE FLARE Binder coll.", value:"426105"},
-        {name:"WHITE FLARE Tech Sticker (Gothitelle) 3 pack", value:"426120"},
-        {name:"BLACK/WHITE Unova Poster coll.", value:"426115"},
-        {name:"DESTINED RIVALS Booster Box 36 pack", value:"424442"},
-        {name:"DESTINED RIVALS ETB", value:"424445"},
-        {name:"DESTINED RIVALS BB", value:"424446"},
-        {name:"DESTINED RIVALS Build & Battle", value:"424449"},
-        {name:"DESTINED RIVALS 3 pack blister", value:"424448"},
-        {name:"DESTINED RIVALS sleeved booster", value:"424436"},
-        {name:"DESTINED RIVALS Cynthia's Garchomp EX Premium coll.", value:"424435"},
-        {name:"DESTINED RIVALS Team Rocket's Mewtwo EX Box", value:"424434"},
-        {name:"JOURNEY TOGETHER Booster Box 36 pack", value:"420197"},
-        {name:"JOURNEY TOGETHER ETB", value:"420196"},
-        {name:"JOURNEY TOGETHER Lillie Premium Tournament coll.", value:"422149"},
-        {name:"JOURNEY TOGETHER BB", value:"420199"},
-        {name:"JOURNEY TOGETHER Hop's Zacian EX Box", value:"420238"},
-        {name:"JOURNEY TOGETHER 3 pack blister", value:"420200"},
-        {name:"JOURNEY TOGETHER sleeved booster", value:"420051"},
-        {name:"PRISMATIC EVOLUTIONS SPC", value:"422620"},
-        {name:"PRISMATIC EVOLITIONS Premium Figure Collection", value:"C200380"},
-        {name:"PRISMATIC EVOLUTIONS ETB", value:"417631"},
-        {name:"PRISMATIC EVOLUTIONS BB", value:"418865"},
-        {name:"PRISMATIC EVOLUTIONS Accessory Pouch Spec coll.", value:"419125"},
-        {name:"PRISMATIC EVOLUTIONS Binder coll.", value:"417633"},
-        {name:"PRISMATIC EVOLUTIONS Surprise Box", value:"418757"},
-        {name:"PRISMATIC EVOLUTIONS Poster Coll.", value:"417632"},
-        {name:"PRISMATIC EVOLUTIONS Tech Sticker 3 pack", value:"417634"},
-        {name:"PRISMATIC EVOLUTIONS 2 pack blister", value:"418758"},
-        {name:"PRISMATIC EVOLUTIONS mini tins", value:"418756"},
-        {name:"SURGING SPARKS Booster Box 36 pack", value:"415023"},
-        {name:"SURGING SPARKS ETB", value:"415009"},
-        {name:"SURGING SPARKS BB", value:"415014"},
-        {name:"SURGING SPARKS Build & Battle", value:"415022"},
-        {name:"SURGING SPARKS 3 pack boosters", value:"415011"},
-        {name:"SURGING SPARKS sleeved boosters", value:"415017"},
-        {name:"STELLAR CROWN Booster Box 36 pack", value:"412520"},
-        {name:"STELLAR CROWN ETB", value:"412067"},
-        {name:"STELLAR CROWN BB", value:"412085"},
-        {name:"STELLAR CROWN Build & Battle", value:"412083"},
-        {name:"STELLAR CROWN 3 pack blister", value:"412084"},
-        {name:"STELLAR CROWN sleeved boosters", value:"412510"},
-        {name:"SHROUDED FABLE ETB", value:"409146"},
-        {name:"SHROUDED FABLE BB", value:"409160"},
-        {name:"SHROUDED FABLE Kingdra EX box", value:"409143"},
-        {name:"SHROUDED FABLE Kingambit Illustration coll.", value:"409147"},
-        {name:"SHROUDED FABLE 3 pack blister (Pecharunt)", value:"408806"},
-        {name:"SHROUDED FABLE mini tins", value:"409144"},
-        {name:"TWILIGHT MASQUERADE Booster Box 36 pack", value:"406369"},
-        {name:"TWILIGHT MASQUERADE ETB", value:"406121"},
-        {name:"TWILIGHT MASQUERADE Build & Battle", value:"406124"},
-        {name:"TWILIGHT MASQUERADE 3 pack blister", value:"412084"},
-        {name:"TEMPORAL FORCES ETB (Walking Wake/Iron Leaves)", value:"404116"},
-        {name:"TEMPORAL FORCES Build & Battle", value:"404114"},
-        {name:"TEMPORAL FORCES 3 pack blister", value:"416732"},
-        {name:"PALDEAN FATES BB", value:"402363"},
-        {name:"PALDEAN FATES mini tins", value:"402358"},
-        {name:"PARADOX RIFT Build & Battle Stadium", value:"398805"},
-        {name:"PARADOX RIFT ETB", value:"C393916"},
-        {name:"PARADOX RIFT BB", value:"20005357"},
-        {name:"PARADOX RIFT Build & Battle", value:"398802"},
-        {name:"151 Blooming Waters", value:"418863"},
-        {name:"151 ETB", value:"395213"},
-        {name:"151 BB", value:"395207"},
-        {name:"151 Zapdos EX coll.", value:"395210"},
-        {name:"151 Alakazam EX coll.", value:"395211"},
-        {name:"151 Poster Collection", value:"395209"},
-        {name:"151 Mini Tins", value:"395214"},
-        {name:"PALDEA EVOLVED ETB", value:"391795"},
-        {name:"PALDEA EVOLVED sleeved booster", value:"391797"},
-        {name:"OBSIDIAN FLAMES Booster Box 36 pack", value:"414957"},
-        {name:"OBSIDIAN FLAMES Battle Stadium", value:"20005354"},
-        {name:"OBSIDIAN FLAMES ETB", value:"C393916"},
-        {name:"OBSIDIAN FLAMES 3 pack blister", value:"20005357"},
-        {name:"OBSIDIAN FLAMES sleeved booster", value:"393918"},
-        {name:"SCARLET & VIOLET ETB Koraidon or Miraidon", value:"C358091"},
-        {name:"SCARLET & VIOLET BB", value:"358092"},
-        {name:"SCARLET & VIOLET sleeved booster", value:"358088"},
-        {name:"CROWN ZENITH Premium Figure coll.", value:"357115"},
-        {name:"CROWN ZENITH ETB", value:"C352582"},
-        {name:"CROWN ZENITH BB", value:"414271"},
-        {name:"CROWN ZENITH Pikachu VMAX Special coll.", value:"357114"},
-        {name:"CROWN ZENITH Tins", value:"357117"},
-        {name:"CROWN ZENITH Pin coll.", value:"357119"},
-        {name:"CROWN ZENITH mini tins", value:"357116"},
-        {name:"SILVER TEMPEST ETB", value:"C347909"},
-        {name:"SILVER TEMPEST BB", value:"347904"},
-        {name:"SILVER TEMPEST 3 pack blister", value:"347908"},
-        {name:"SILVER TEMPEST sleeved booster", value:"347911"},
-        {name:"LOST ORIGIN ETB", value:"342882"},
-        {name:"LOST ORIGIN BB", value:"342883"},
-        {name:"ASTRAL RADIANCE ETB", value:"339784"},
-        {name:"ASTRAL RADIANCE sleeved booster", value:"339789"},
-        {name:"BRILLIANT STARS sleeved booster", value:"322811"},
-        {name:"SHINING FATES Premium coll.", value:"234477"},
-        {name:"SHINING FATES Pikachu Box", value:"234479"},
-        {name:"VIVID VOLTAGE ETB", value:"223647"},
-        {name:"DARKNESS ABLAZE ETB", value:"217587"},
-        {name:"Terapagos EX Ultra-Premium coll.", value:"414267"},
-        {name:"Greninja EX Premium coll.", value:"414090"},
-        {name:"Tera Brawlers Premium coll.", value:"408238"},
-        {name:"Combined Powers Premium coll.", value:"403319"},
-        {name:"Iono Premium coll.", value:"404277"},
-        {name:"Ogerpon EX Premium coll.", value:"415390"},
-        {name:"Gyarados EX Premium coll.", value:"398799"},
-        {name:"Armarouge EX Premium coll.", value:"404320"},
-        {name:"Kleavor VSTAR Premium coll.", value:"339943"},
-        {name:"Collector Chest Fall (2024)", value:"415366"},
-        {name:"Collector Chest Summer (2024)", value:"407880"},
-        {name:"Paradox Clash Tin", value:"406011"},
-        {name:"Mimikyu EX box", value:"357735"},
-        {name:"Paldea Partners Tin", value:"394643"},
-        {name:"Paldea Legends Tin (Koraidon EX or Miraidon EX)", value:"392260"},
-        {name:"Charizard EX Special Collection", value:"421027"},
-        {name:"Team Rocket Tins", value:"427430"},
-        {name:"Mega Kangaskhan EX Box (SKU pending)", value:"", pending:true},
-        {name:"Mega Venasaur EX Premium Collection (SKU pending)", value:"", pending:true},
-        {name:"Mabosstiff EX Box", value:"403318"},
-        {name:"Palafin EX Box", value:"407657"},
-        {name:"Houndstone EX Box", value:"414694"},
-        {name:"Roaring Moon/Iron Valiant EX Box", value:"400989"},
-        {name:"Bloodmoon Ursaluna EX Box", value:"415391"},
-        {name:"Grafaiai EX Box", value:"404278"},
-        {name:"Paldea coll.", value:"352584"},
-        {name:"Poke Ball Tin (2024)", value:"414092"},
-        {name:"Poke Ball Tin", value:"322207"},
-        {name:"Stacking tin 2025 Q1 (Ogerpon/Paradox/Treasures)", value:"419639"},
-        {name:"Stacking tin (Grass/Water/Electric)", value:"327862"},
-        {name:"Eraser blister 2 pack (2024)", value:"407881"},
-        {name:"Paldea Friends mini tins", value:"359933"},
-        {name:"Vibrant Paldea mini tins", value:"406672"},
-        {name:"Venusaur EX and Blastoise EX Premium Collection", value:"425832"},
-        {name:"Mega Latias EX Box", value:"428228"},
-        {name:"Mega Lucario EX Figure Collection (SKU pending)", value:"", pending:true},
-      ]
-    },
-    {
-      store: "Dollar General",
-      items: [
-        {name:"Tins – 3 pack", value:"820650809859"},
-        {name:"Mini tins", value:"820650105838"},
-        {name:"Checklane blister", value:"820650806568"},
-        {name:"151 Poster coll.", value:"820650853166"},
-        {name:"Poke Ball Tin", value:"820650809767"},
-        {name:"Blister – 2 pack", value:"820650852558"},
-        {name:"Sleeved booster", value:"820650801563"},
-      ]
-    },
-    {
-      store: "Costco",
-      items: [
-        {name:"151 Blooming Waters – 2 pack", value:"https://www.costco.com/Pokemon-151-Blooming-Waters-Premium-Collection-2-pack.product.1916742.html"},
-        {name:"Prismatic Evolutions ETB/BB Bundle", value:"https://www.costco.com/.product.1898462.html"},
-        {name:"151 mini tins – 5 pack (set #1)", value:"https://www.costco.com/pokemon-scarlet-%26-violet---151-5-pack-mini-tins-machamp%2C-kadabra%2C-meowth%2C-slowpoke%2C-arcanine.product.4000297824.html"},
-        {name:"151 mini tins – 5 pack (set #2)", value:"https://www.costco.com/pokemon-scarlet-%26-violet---151-5-pack-mini-tins-electabuzz%2C-scyther%2C-magneton%2C-dragonite%2C-gengar.product.4000297877.html"},
-        {name:"PALDEAN FATES mini tins – 5 pack", value:"https://www.costco.com/pokemon-paldean-fates-5-pack-mini-tins-%2B-4-promo-cards.product.4000297876.html"},
-        {name:"151 ETB + Miraidon EX Tin + Koraidon EX Tin", value:"https://www.costco.com/pokemon-elite-trainer-box%3A-scarlet-%2526-violet-151-%2B-miraidon-ex-tin-%2B-koraidon-window-tin.product.4000283850.html"},
-        {name:"151 Alakazam EX + Zapdos EX box", value:"https://www.costco.com/pokemon-151-scarlet-%26-violet-ex-boxes---alakazam-%26-zapdos%2C-2-pack.product.4000241197.html"},
-        {name:"151 Ultra-Premium coll.", value:"https://www.costco.com/pok%C3%A9mon-scarlet-%2526-violet-series---151-ultra-premium-collection.product.4000271399.html"},
-      ]
-    },
-    {
-      store: "Sam’s Club",
-      items: [
-        {name:"PRISMATIC EVOLUTIONS Lucario Ex & Tyranitar Ex Premium Collection", value:"https://www.samsclub.com/ip/seot/17295401081"},
-        {name:"PRISMATIC EVOLUTIONS ETB + Poke Ball", value:"https://www.samsclub.com/p/pokemon-elite-trainer-box-poke-ball/P990425183"},
-        {name:"Poke Ball tin + 2 mini tins", value:"https://www.samsclub.com/p/pokemon-poke-ball-two-mini-tins/P990387658?xid=plp_product_2"},
-        {name:"Lucario V & Tyranitar V Heavy Hitters Premium coll.", value:"https://www.samsclub.com/p/pokemon-heavy-hitters-premium-collection/P03010010"},
-        {name:"Charizard EX Super-Premium coll.", value:"https://www.samsclub.com/p/pokemon-tcg-charizard-ex-super-premium-collection/P990402489?source=samsclub.com"},
-      ]
-    },
-  ];
+<script>
+/* Parallax: tiny background shift on scroll (feels like Charizard is flying) */
+(function(){
+  const bg = document.querySelector('.bg');
+  let lastY = 0;
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY || 0;
+    if (Math.abs(y - lastY) < 2) return;
+    lastY = y;
+    bg.style.transform = `translateY(${y * 0.15}px)`; // parallax factor
+  }, {passive:true});
+})();
 
-  // ====== RENDER =============================================================
-  const host = document.getElementById('retailers');
+/* ====== DATA =============================================================== */
+const DATA = [
+  {
+    store: "Best Buy",
+    items: [
+      {name:"Mega Charizard X EX UPC", value:"6644581"},
+      {name:"PHANTASMAL FLAMES Booster Box 36 pack", value:"6644581"},
+      {name:"PHANTASMAL FLAMES ETB", value:"6645345"},
+      {name:"PHANTASMAL FLAMES BB", value:"6645343"},
+      {name:"PHANTASMAL FLAMES 3 pack blister", value:"6645342"},
+      {name:"PHANTASMAL FLAMES sleeved booster", value:"6645340"},
+      {name:"MEGA EVOLUTIONS Booster Box 36 pack", value:"6639109"},
+      {name:"MEGA EVOLUTIONS ETB", value:"6639103"},
+      {name:"MEGA EVOLUTIONS BB", value:"6639108"},
+      {name:"MEGA EVOLUTIONS 3 pack blister", value:"6639101"},
+      {name:"MEGA EVOLUTIONS sleeved booster", value:"6639110"},
+      {name:"Mega Heroes mini tins", value:"6639102"},
+      {name:"BLACK BOLT ETB", value:"6632397"},
+      {name:"BLACK BOLT BB", value:"6632402"},
+      {name:"BLACK BOLT Binder coll.", value:"6632388"},
+      {name:"BLACK BOLT Tech Sticker (Reuniclus) 3 pack", value:"6632393"},
+      {name:"BLACK/WHITE Unova Victini Illustration coll.", value:"6632391"},
+      {name:"BLACK BOLT/WHITE FLARE Unova mini tins", value:"6632392"},
+      {name:"WHITE FLARE ETB", value:"6632394"},
+      {name:"WHITE FLARE BB", value:"6632399"},
+      {name:"WHITE FLARE Binder coll.", value:"6632390"},
+      {name:"WHITE FLARE Tech Sticker (Gothitelle) 3 pack", value:"6632395"},
+      {name:"BLACK/WHITE Unova Poster coll.", value:"6632400"},
+      {name:"DESTINED RIVALS Booster Box 36 pack", value:"6624826"},
+      {name:"DESTINED RIVALS ETB", value:"6624825"},
+      {name:"DESTINED RIVALS BB", value:"6624828"},
+      {name:"DESTINED RIVALS Cynthia's Garchomp EX Premium coll.", value:"6625124"},
+      {name:"DESTINED RIVALS Team Rocket's Mewtwo EX Box", value:"6625125"},
+      {name:"DESTINED RIVALS 3 pack blister", value:"6624830"},
+      {name:"DESTINED RIVALS sleeved booster", value:"6624827"},
+      {name:"JOURNEY TOGETHER Booster Box 36 pack", value:"6614262"},
+      {name:"JOURNEY TOGETHER ETB", value:"6614267"},
+      {name:"JOURNEY TOGETHER Lillie Premium Tournament coll.", value:"6614267"},
+      {name:"JOURNEY TOGETHER BB", value:"6614264"},
+      {name:"JOURNEY TOGETHER Hop's Zacian EX Box", value:"6614261"},
+      {name:"JOURNEY TOGETHER 3 pack blister", value:"6614260"},
+      {name:"JOURNEY TOGETHER sleeved booster", value:"6614259"},
+      {name:"PRISMATIC EVOLUTIONS SPC", value:"6621081"},
+      {name:"PRISMATIC EVOLUTIONS Premium Figure Collection", value:"6639107"},
+      {name:"PRISMATIC EVOLUTIONS ETB", value:"6606082"},
+      {name:"PRISMATIC EVOLUTIONS Binder coll.", value:"6606079"},
+      {name:"PRISMATIC EVOLUTIONS BB", value:"6608206"},
+      {name:"PRISMATIC EVOLUTIONS Surprise Box", value:"6607717"},
+      {name:"PRISMATIC EVOLUTIONS Poster coll.", value:"6606080"},
+      {name:"PRISMATIC EVOLUTIONS Accessory Pouch Spec coll.", value:"6609202"},
+      {name:"PRISMATIC EVOLUTIONS Tech Sticker 3 pack", value:"6606078"},
+      {name:"PRISMATIC EVOLUTIONS 2 pack blister", value:"6607716"},
+      {name:"PRISMATIC EVOLUTIONS mini tins", value:"6607719"},
+      {name:"SURGING SPARKS Booster Box 36 pack", value:"6598558"},
+      {name:"SURGING SPARKS ETB", value:"6598557"},
+      {name:"SURGING SPARKS BB", value:"6598561"},
+      {name:"SURGING SPARKS 3 pack blister", value:"6598559"},
+      {name:"SURGING SPARKS sleeved boosters", value:"6598560"},
+      {name:"STELLAR CROWN ETB", value:"6588400"},
+      {name:"STELLAR CROWN 3 pack blister", value:"6588398"},
+      {name:"STELLAR CROWN sleeved boosters", value:"6588401"},
+      {name:"SHROUDED FABLE ETB", value:"6584431"},
+      {name:"SHROUDED FABLE BB", value:"6584432"},
+      {name:"SHROUDED FABLE 3 pack blister", value:"6584429"},
+      {name:"SHROUDED FABLE mini tins", value:"6584426"},
+      {name:"TWILIGHT MASQUERADE Booster Box 36 pack", value:"6578901"},
+      {name:"TWILIGHT MASQUERADE ETB", value:"6578904"},
+      {name:"TWILIGHT MASQUERADE sleeved boosters", value:"6578902"},
+      {name:"TEMPORAL FORCES Booster Box 36 pack", value:"6571897"},
+      {name:"TEMPORAL FORCES ETB", value:"6571900"},
+      {name:"TEMPORAL FORCES 3 pack blister (Cyclizar/Cleffa)", value:"6571899"},
+      {name:"TEMPORAL FORCES sleeved boosters", value:"6571896"},
+      {name:"PALDEAN FATES ETB", value:"6568010"},
+      {name:"PALDEAN FATES BB", value:"6568006"},
+      {name:"PARADOX RIFT ETB", value:"6557811"},
+      {name:"PARADOX RIFT 3 pack blister", value:"6557808"},
+      {name:"PARADOX RIFT sleeved boosters", value:"6557810"},
+      {name:"151 ETB", value:"6548366"},
+      {name:"151 BB", value:"6548371"},
+      {name:"151 Alakazam EX coll.", value:"6548368"},
+      {name:"151 Zapdos EX coll.", value:"6548370"},
+      {name:"OBSIDIAN FLAMES ETB", value:"6546727"},
+      {name:"OBSIDIAN FLAMES BB", value:"6546727"},
+      {name:"PALDEA EVOLVED ETB", value:"6540127"},
+      {name:"PALDEA EVOLVED BB", value:"6540131"},
+      {name:"PALDEA EVOLVED sleeved booster", value:"6540134"},
+      {name:"SCARLET & VIOLET ETB", value:"6531749"},
+      {name:"SCARLET & VIOLET 3 pack blister", value:"6531751"},
+      {name:"SCARLET & VIOLET sleeved boosters", value:"6531831"},
+      {name:"Mega Latias EX Box", value:"6640836"},
+      {name:"Mega Kangaskhan EX Box", value:"6644579"},
+      {name:"Hydreigon EX & Dragapult EX Premium Collection", value:"6640834"},
+      {name:"Paradox Clash Tins", value:"6578474"},
+      {name:"Azure Legends Tins", value:"6610888"},
+      {name:"Paldea Partners Tin", value:"6548382"},
+      {name:"Vibrant Paldea Mini Tins", value:"6579413"},
+      {name:"Stacking Tins (Q1 2025)", value:"6598560"},
+      {name:"Roaring Moon/Iron Valiant EX Box", value:"6560117"},
+      {name:"Oinkologne EX Box", value:"6549867"},
+      {name:"Grafaiai EX Box", value:"6573891"},
+      {name:"Mega Lucario EX Figure Collection", value:"6643670"},
+      {name:"Mega Venusaur EX Premium Collection", value:"6644577"},
+      {name:"Team Rocket Tins", value:"6637037"},
+      {name:"Slashing Legends Tins", value:"6621083"},
+      {name:"Paradox Destinies Tin", value:"6621083"},
+      {name:"Paldea Legends Tin", value:"6540129"},
+      {name:"Poke Ball Tins (Q4 2024)", value:"6540129"},
+      {name:"Mabosstiff EX Box", value:"6569192"},
+      {name:"Palafin EX Box", value:"6580252"},
+      {name:"Houndstone EX Box", value:"6590380"},
+      {name:"Bloodmoon Ursaluna EX Box", value:"6599407"},
+      {name:"Paldea Adventure Chest", value:"6569653"},
+    ]
+  },
+  {
+    store: "Walmart",
+    items: [
+      {name:"MEGA EVOLUTIONS ETB", value:"17328862239"},
+      {name:"MEGA EVOLUTIONS BB", value:"17344505131"},
+      {name:"MEGA EVOLUTIONS Build & Battle", value:"17269516415"},
+      {name:"MEGA EVOLUTIONS 3 pack blister", value:"17515901587"},
+      {name:"MEGA EVOLUTIONS sleeved booster", value:"17344605256"},
+      {name:"BLACK BOLT ETB", value:"16498668973"},
+      {name:"BLACK BOLT BB", value:"16484003729"},
+      {name:"BLACK BOLT Binder coll.", value:"16448166601"},
+      {name:"BLACK BOLT Tech Sticker (Reuniclus) 3 pack", value:"16448166601"},
+      {name:"BLACK/WHITE Unova Victini Illustration coll.", value:"16454274271"},
+      {name:"BLACK BOLT/WHITE FLARE Unova mini tins", value:"16800072727"},
+      {name:"WHITE FLARE ETB", value:"16446322202"},
+      {name:"WHITE FLARE BB", value:"16516160047"},
+      {name:"WHITE FLARE Binder coll.", value:"16516160046"},
+      {name:"WHITE FLARE Tech Sticker (Gothitelle) 3 pack", value:"16448166186"},
+      {name:"BLACK/WHITE Unova Poster coll.", value:"16517213276"},
+      {name:"DESTINED RIVALS Booster Box 36 pack", value:"15762118882"},
+      {name:"DESTINED RIVALS ETB", value:"15718673510"},
+      {name:"DESTINED RIVALS BB", value:"15700422581"},
+      {name:"DESTINED RIVALS Cynthia's Garchomp EX Premium coll.", value:"16036963618"},
+      {name:"DESTINED RIVALS Team Rocket's Mewtwo EX Box", value:"15992924968"},
+      {name:"DESTINED RIVALS 3 pack blister", value:"16060605120"},
+      {name:"DESTINED RIVALS sleeved boosters", value:"16034470614"},
+      {name:"JOURNEY TOGETHER ETB", value:"15156564532"},
+      {name:"JOURNEY TOGETHER Iono's Bellibolt EX Premium coll.", value:"15382923523"},
+      {name:"JOURNEY TOGETHER BB", value:"15042474261"},
+      {name:"JOURNEY TOGETHER 3 pack blister", value:"15118973121"},
+      {name:"JOURNEY TOGETHER checklane blister (?)", value:"15127073643"},
+      {name:"JOURNEY TOGETHER sleeved boosters", value:"15153417617"},
+      {name:"PRISMATIC EVOLUTIONS Super-Premium coll.", value:"15494520186"},
+      {name:"PRISMATIC EVOLUTIONS ETB", value:"13816151308"},
+      {name:"PRISMATIC EVOLUTIONS BB", value:"14803962651"},
+      {name:"PRISMATIC EVOLUTIONS Accessory Pouch Special coll.", value:"14169661774"},
+      {name:"PRISMATIC EVOLUTIONS Binder coll.", value:"14078321300"},
+      {name:"PRISMATIC EVOLUTIONS Poster coll.", value:"14091452016"},
+      {name:"PRISMATIC EVOLUTIONS Glaceon Tech Sticker 3 pack", value:"14885471059"},
+      {name:"PRISMATIC EVOLUTIONS Leafeon Tech Sticker 3 pack", value:"14904152274"},
+      {name:"PRISMATIC EVOLUTIONS Sylveon Tech Sticker 3 pack", value:"14862473632"},
+      {name:"PRISMATIC EVOLUTIONS 2 pack blister", value:"14764973846"},
+      {name:"PRISMATIC EVOLUTIONS mini tins", value:"11255406228"},
+      {name:"SURGING SPARKS ETB", value:"10692607747"},
+      {name:"SURGING SPARKS BB", value:"10692754252"},
+      {name:"SURGING SPARKS 3 pack boosters", value:"13793261801"},
+      {name:"SURGING SPARKS sleeved boosters", value:"12603711388"},
+      {name:"STELLAR CROWN Booster Box 36 pack", value:"8867673598"},
+      {name:"STELLAR CROWN ETB", value:"7762615377"},
+      {name:"STELLAR CROWN BB", value:"7778210362"},
+      {name:"STELLAR CROWN 3 pack boosters (Tinkaton)", value:"9323301769"},
+      {name:"STELLAR CROWN 3 pack boosters (Latias)", value:"11226954497"},
+      {name:"STELLAR CROWN sleeved boosters", value:"9310572859"},
+      {name:"SHROUDED FABLE ETB", value:"5977297380"},
+      {name:"SHROUDED FABLE BB", value:"5988933729"},
+      {name:"SHROUDED FABLE 3 pack blister (Pecharunt)", value:"7559459632"},
+      {name:"SHROUDED FABLE Kingdra EX Box", value:"8483260041"},
+      {name:"TWILIGHT MASQUERADE ETB", value:"5558569421"},
+      {name:"TWILIGHT MASQUERADE BB", value:"5511020275"},
+      {name:"TWILIGHT MASQUERADE 3 pack blister (Revavroom)", value:"5679588917"},
+      {name:"TWILIGHT MASQUERADE 3 pack blister (Snorlax)", value:"5676427231"},
+      {name:"TEMPORAL FORCES ETB (Walking Wake)", value:"5493766253"},
+      {name:"TEMPORAL FORCES ETB (Iron Leaves)", value:"5418357408"},
+      {name:"TEMPORAL FORCES BB", value:"5418357413"},
+      {name:"TEMPORAL FORCES 3 pack blister (Cleffa)", value:"5337897627"},
+      {name:"TEMPORAL FORCES 3 pack blister (Cyclizar)", value:"5347596968"},
+      {name:"PALDEAN FATES ETB", value:"5226743070"},
+      {name:"PALDEAN FATES BB", value:"5226743077"},
+      {name:"PALDEAN FATES Shiny Charizard Tin", value:"5385006261"},
+      {name:"PALDEAN FATES Iron Treads Tin", value:"5369461027"},
+      {name:"PALDEAN FATES EX Premium coll. (Quaquaval)", value:"5296781892"},
+      {name:"PALDEAN FATES EX Premium coll. (Meowscarada)", value:"5296781894"},
+      {name:"PALDEAN FATES EX Premium coll. (Skeledirge)", value:"5296781893"},
+      {name:"PALDEAN FATES mini tins", value:"5226743068"},
+      {name:"PARADOX RIFT ETB", value:"5046453045"},
+      {name:"PARADOX RIFT BB", value:"5089154509"},
+      {name:"PARADOX RIFT 3 pack blister (Cetitan)", value:"5046100011"},
+      {name:"PARADOX RIFT 3 pack blister (Arctibax)", value:"5113125909"},
+      {name:"151 Ultra Premium Box", value:"3100716488"},
+      {name:"151 Mini Tins Box Set", value:"16522474508"},
+      {name:"151 ETB", value:"3417089291"},
+      {name:"151 Binder coll.", value:"3006269158"},
+      {name:"151 BB", value:"1160437186"},
+      {name:"151 Zapdos EX coll.", value:"3534446787"},
+      {name:"151 Alakazam EX coll.", value:"2555285136"},
+      {name:"151 Poster coll.", value:"2121361619"},
+      {name:"151 mini tins", value:"3034232830"},
+      {name:"OBSIDIAN FLAMES ETB", value:"3280189864"},
+      {name:"OBSIDIAN FLAMES BB", value:"1722511419"},
+      {name:"OBSIDIAN FLAMES 3 pack blister", value:"2214595737"},
+      {name:"OBSIDIAN FLAMES checklane blister", value:"2607430881"},
+      {name:"PALDEA EVOLVED ETB", value:"3593531801"},
+      {name:"PALDEA EVOLVED BB", value:"1035833722"},
+      {name:"PALDEA EVOLVED 3 pack blister (Varoom)", value:"2374086635"},
+      {name:"SCARLET & VIOLET ETB Koraidon or Miraidon", value:"2668346140"},
+      {name:"SCARLET & VIOLET BB", value:"1481496681"},
+      {name:"Team Rocket Tins", value:"17577710710"},
+      {name:"Charizard EX SPC", value:"8177053453"},
+      {name:"Annihilape EX coll. Box", value:"3690005912"},
+      {name:"Azure Legends Tin", value:"15024524281"},
+      {name:"Paradox Destinies (Iron Crown)", value:"11227263141"},
+      {name:"Paradox Destinies (Iron Boulder)", value:"11247660599"},
+      {name:"Paradox Destinies (Gouging Fire)", value:"11233258311"},
+      {name:"Paradox Destinies (Raging Bolt)", value:"11227313344"},
+      {name:"Paradox Clash Tin (Walking Wake)", value:"5909414034"},
+      {name:"Paradox Clash Tin (Iron Leaves)", value:"5668636817"},
+      {name:"Armarouge EX Prem. coll.", value:"5378390855"},
+      {name:"Grafaiai EX Box", value:"5418257351"},
+      {name:"Roaring Moon/Iron Valiant EX Box", value:"5038633155"},
+      {name:"Legendary Warriors Premium coll.", value:"13190955834"},
+      {name:"Pikachu VMax Premium coll.", value:"1668497356"},
+      {name:"Crown Zenith Regieleki V / Regidrago V coll.", value:"2036332917"},
+      {name:"Fall Collectors Chest 2023 (Charizard)", value:"5038633157"},
+      {name:"Slashing Legends Tin", value:"15840514011"},
+      {name:"Origin Forme Dialga/Palkia Vstar Premium Collection", value:"2922306172"},
+      {name:"Terapagos EX UPC", value:"9745761686"},
+      {name:"Paldea Partners Tin (Quaquaval)", value:"3459510704"},
+      {name:"Paldea Partners Tin (Meowscarada)", value:"1493426135"},
+      {name:"Paldea Partners Tin (Skeledirge)", value:"3224359179"},
+      {name:"Paldea Legends Tin (Koraidon)", value:"1676168797"},
+      {name:"Paldea Legends Tin (Miraidon)", value:"1535242851"},
+      {name:"Grand Adventure coll.", value:"10681771578"},
+      {name:"Hop's Zacian EX Box", value:"15186456025"},
+      {name:"Cyclizar EX Box", value:"1796628871"},
+      {name:"Ogerpon EX Prem. coll.", value:"12616660824"},
+      {name:"Tyranitar EX Prem. coll.", value:"5301432142"},
+      {name:"Palafin EX Box", value:"5681039742"},
+      {name:"Stacking Tin 2025 Q1 (Ogerpon/Paradox/Treasures)", value:"15113272854"},
+      {name:"Crown Zenith Tin", value:"1750362014"},
+      {name:"Lucario VStar Premium coll.", value:"358343864"},
+      {name:"Mystery Power Box - 5 packs", value:"2348412263"},
+      {name:"Fall Collectors Chest 2024 (Pikachu)", value:"13587262907"},
+    ]
+  },
+  {
+    store: "GameStop",
+    items: [
+      {name:"MEGA EVOLUTIONS Booster Box 36 pack", value:"428257"},
+      {name:"MEGA EVOLUTIONS ETB", value:"428260"},
+      {name:"MEGA EVOLUTIONS BB", value:"428265"},
+      {name:"MEGA EVOLUTIONS Build & Battle", value:"428265"},
+      {name:"MEGA EVOLUTIONS 3 pack blister", value:"428269"},
+      {name:"MEGA EVOLUTIONS checklane blister (SKU pending)", value:"", pending:true},
+      {name:"MEGA EVOLUTIONS sleeved booster (SKU pending)", value:"", pending:true},
+      {name:"Mega Heroes mini tins", value:"428270"},
+      {name:"BLACK BOLT ETB", value:"426102"},
+      {name:"BLACK BOLT BB", value:"426122"},
+      {name:"BLACK BOLT Binder coll.", value:"426104"},
+      {name:"BLACK BOLT Tech Sticker (Reuniclus) 3 pack", value:"426119"},
+      {name:"BLACK/WHITE Unova Victini Illustration coll.", value:"426121"},
+      {name:"BLACK BOLT/WHITE FLARE Unova mini tins", value:"426112"},
+      {name:"WHITE FLARE ETB", value:"426103"},
+      {name:"WHITE FLARE BB", value:"426123"},
+      {name:"WHITE FLARE Binder coll.", value:"426105"},
+      {name:"WHITE FLARE Tech Sticker (Gothitelle) 3 pack", value:"426120"},
+      {name:"BLACK/WHITE Unova Poster coll.", value:"426115"},
+      {name:"DESTINED RIVALS Booster Box 36 pack", value:"424442"},
+      {name:"DESTINED RIVALS ETB", value:"424445"},
+      {name:"DESTINED RIVALS BB", value:"424446"},
+      {name:"DESTINED RIVALS Build & Battle", value:"424449"},
+      {name:"DESTINED RIVALS 3 pack blister", value:"424448"},
+      {name:"DESTINED RIVALS sleeved booster", value:"424436"},
+      {name:"DESTINED RIVALS Cynthia's Garchomp EX Premium coll.", value:"424435"},
+      {name:"DESTINED RIVALS Team Rocket's Mewtwo EX Box", value:"424434"},
+      {name:"JOURNEY TOGETHER Booster Box 36 pack", value:"420197"},
+      {name:"JOURNEY TOGETHER ETB", value:"420196"},
+      {name:"JOURNEY TOGETHER Lillie Premium Tournament coll.", value:"422149"},
+      {name:"JOURNEY TOGETHER BB", value:"420199"},
+      {name:"JOURNEY TOGETHER Hop's Zacian EX Box", value:"420238"},
+      {name:"JOURNEY TOGETHER 3 pack blister", value:"420200"},
+      {name:"JOURNEY TOGETHER sleeved booster", value:"420051"},
+      {name:"PRISMATIC EVOLUTIONS SPC", value:"422620"},
+      {name:"PRISMATIC EVOLITIONS Premium Figure Collection", value:"C200380"},
+      {name:"PRISMATIC EVOLUTIONS ETB", value:"417631"},
+      {name:"PRISMATIC EVOLUTIONS BB", value:"418865"},
+      {name:"PRISMATIC EVOLUTIONS Accessory Pouch Spec coll.", value:"419125"},
+      {name:"PRISMATIC EVOLUTIONS Binder coll.", value:"417633"},
+      {name:"PRISMATIC EVOLUTIONS Surprise Box", value:"418757"},
+      {name:"PRISMATIC EVOLUTIONS Poster Coll.", value:"417632"},
+      {name:"PRISMATIC EVOLUTIONS Tech Sticker 3 pack", value:"417634"},
+      {name:"PRISMATIC EVOLUTIONS 2 pack blister", value:"418758"},
+      {name:"PRISMATIC EVOLUTIONS mini tins", value:"418756"},
+      {name:"SURGING SPARKS Booster Box 36 pack", value:"415023"},
+      {name:"SURGING SPARKS ETB", value:"415009"},
+      {name:"SURGING SPARKS BB", value:"415014"},
+      {name:"SURGING SPARKS Build & Battle", value:"415022"},
+      {name:"SURGING SPARKS 3 pack boosters", value:"415011"},
+      {name:"SURGING SPARKS sleeved boosters", value:"415017"},
+      {name:"STELLAR CROWN Booster Box 36 pack", value:"412520"},
+      {name:"STELLAR CROWN ETB", value:"412067"},
+      {name:"STELLAR CROWN BB", value:"412085"},
+      {name:"STELLAR CROWN Build & Battle", value:"412083"},
+      {name:"STELLAR CROWN 3 pack blister", value:"412084"},
+      {name:"STELLAR CROWN sleeved boosters", value:"412510"},
+      {name:"SHROUDED FABLE ETB", value:"409146"},
+      {name:"SHROUDED FABLE BB", value:"409160"},
+      {name:"SHROUDED FABLE Kingdra EX box", value:"409143"},
+      {name:"SHROUDED FABLE Kingambit Illustration coll.", value:"409147"},
+      {name:"SHROUDED FABLE 3 pack blister (Pecharunt)", value:"408806"},
+      {name:"SHROUDED FABLE mini tins", value:"409144"},
+      {name:"TWILIGHT MASQUERADE Booster Box 36 pack", value:"406369"},
+      {name:"TWILIGHT MASQUERADE ETB", value:"406121"},
+      {name:"TWILIGHT MASQUERADE Build & Battle", value:"406124"},
+      {name:"TWILIGHT MASQUERADE 3 pack blister", value:"412084"},
+      {name:"TEMPORAL FORCES ETB (Walking Wake/Iron Leaves)", value:"404116"},
+      {name:"TEMPORAL FORCES Build & Battle", value:"404114"},
+      {name:"TEMPORAL FORCES 3 pack blister", value:"416732"},
+      {name:"PALDEAN FATES BB", value:"402363"},
+      {name:"PALDEAN FATES mini tins", value:"402358"},
+      {name:"PARADOX RIFT Build & Battle Stadium", value:"398805"},
+      {name:"PARADOX RIFT ETB", value:"C393916"},
+      {name:"PARADOX RIFT BB", value:"20005357"},
+      {name:"PARADOX RIFT Build & Battle", value:"398802"},
+      {name:"151 Blooming Waters", value:"418863"},
+      {name:"151 ETB", value:"395213"},
+      {name:"151 BB", value:"395207"},
+      {name:"151 Zapdos EX coll.", value:"395210"},
+      {name:"151 Alakazam EX coll.", value:"395211"},
+      {name:"151 Poster Collection", value:"395209"},
+      {name:"151 Mini Tins", value:"395214"},
+      {name:"PALDEA EVOLVED ETB", value:"391795"},
+      {name:"PALDEA EVOLVED sleeved booster", value:"391797"},
+      {name:"OBSIDIAN FLAMES Booster Box 36 pack", value:"414957"},
+      {name:"OBSIDIAN FLAMES Battle Stadium", value:"20005354"},
+      {name:"OBSIDIAN FLAMES ETB", value:"C393916"},
+      {name:"OBSIDIAN FLAMES 3 pack blister", value:"20005357"},
+      {name:"OBSIDIAN FLAMES sleeved booster", value:"393918"},
+      {name:"SCARLET & VIOLET ETB Koraidon or Miraidon", value:"C358091"},
+      {name:"SCARLET & VIOLET BB", value:"358092"},
+      {name:"SCARLET & VIOLET sleeved booster", value:"358088"},
+      {name:"CROWN ZENITH Premium Figure coll.", value:"357115"},
+      {name:"CROWN ZENITH ETB", value:"C352582"},
+      {name:"CROWN ZENITH BB", value:"414271"},
+      {name:"CROWN ZENITH Pikachu VMAX Special coll.", value:"357114"},
+      {name:"CROWN ZENITH Tins", value:"357117"},
+      {name:"CROWN ZENITH Pin coll.", value:"357119"},
+      {name:"CROWN ZENITH mini tins", value:"357116"},
+      {name:"SILVER TEMPEST ETB", value:"C347909"},
+      {name:"SILVER TEMPEST BB", value:"347904"},
+      {name:"SILVER TEMPEST 3 pack blister", value:"347908"},
+      {name:"SILVER TEMPEST sleeved booster", value:"347911"},
+      {name:"LOST ORIGIN ETB", value:"342882"},
+      {name:"LOST ORIGIN BB", value:"342883"},
+      {name:"ASTRAL RADIANCE ETB", value:"339784"},
+      {name:"ASTRAL RADIANCE sleeved booster", value:"339789"},
+      {name:"BRILLIANT STARS sleeved booster", value:"322811"},
+      {name:"SHINING FATES Premium coll.", value:"234477"},
+      {name:"SHINING FATES Pikachu Box", value:"234479"},
+      {name:"VIVID VOLTAGE ETB", value:"223647"},
+      {name:"DARKNESS ABLAZE ETB", value:"217587"},
+      {name:"Terapagos EX Ultra-Premium coll.", value:"414267"},
+      {name:"Greninja EX Premium coll.", value:"414090"},
+      {name:"Tera Brawlers Premium coll.", value:"408238"},
+      {name:"Combined Powers Premium coll.", value:"403319"},
+      {name:"Iono Premium coll.", value:"404277"},
+      {name:"Ogerpon EX Premium coll.", value:"415390"},
+      {name:"Gyarados EX Premium coll.", value:"398799"},
+      {name:"Armarouge EX Premium coll.", value:"404320"},
+      {name:"Kleavor VSTAR Premium coll.", value:"339943"},
+      {name:"Collector Chest Fall (2024)", value:"415366"},
+      {name:"Collector Chest Summer (2024)", value:"407880"},
+      {name:"Paradox Clash Tin", value:"406011"},
+      {name:"Mimikyu EX box", value:"357735"},
+      {name:"Paldea Partners Tin", value:"394643"},
+      {name:"Paldea Legends Tin (Koraidon EX or Miraidon EX)", value:"392260"},
+      {name:"Charizard EX Special Collection", value:"421027"},
+      {name:"Team Rocket Tins", value:"427430"},
+      {name:"Mega Kangaskhan EX Box (SKU pending)", value:"", pending:true},
+      {name:"Mega Venasaur EX Premium Collection (SKU pending)", value:"", pending:true},
+      {name:"Mabosstiff EX Box", value:"403318"},
+      {name:"Palafin EX Box", value:"407657"},
+      {name:"Houndstone EX Box", value:"414694"},
+      {name:"Roaring Moon/Iron Valiant EX Box", value:"400989"},
+      {name:"Bloodmoon Ursaluna EX Box", value:"415391"},
+      {name:"Grafaiai EX Box", value:"404278"},
+      {name:"Paldea coll.", value:"352584"},
+      {name:"Poke Ball Tin (2024)", value:"414092"},
+      {name:"Poke Ball Tin", value:"322207"},
+      {name:"Stacking tin 2025 Q1 (Ogerpon/Paradox/Treasures)", value:"419639"},
+      {name:"Stacking tin (Grass/Water/Electric)", value:"327862"},
+      {name:"Eraser blister 2 pack (2024)", value:"407881"},
+      {name:"Paldea Friends mini tins", value:"359933"},
+      {name:"Vibrant Paldea mini tins", value:"406672"},
+      {name:"Venusaur EX and Blastoise EX Premium Collection", value:"425832"},
+      {name:"Mega Latias EX Box", value:"428228"},
+      {name:"Mega Lucario EX Figure Collection (SKU pending)", value:"", pending:true},
+    ]
+  },
+  {
+    store: "Dollar General",
+    items: [
+      {name:"Tins – 3 pack", value:"820650809859"},
+      {name:"Mini tins", value:"820650105838"},
+      {name:"Checklane blister", value:"820650806568"},
+      {name:"151 Poster coll.", value:"820650853166"},
+      {name:"Poke Ball Tin", value:"820650809767"},
+      {name:"Blister – 2 pack", value:"820650852558"},
+      {name:"Sleeved booster", value:"820650801563"},
+    ]
+  },
+  {
+    store: "Costco",
+    items: [
+      {name:"151 Blooming Waters – 2 pack", value:"https://www.costco.com/Pokemon-151-Blooming-Waters-Premium-Collection-2-pack.product.1916742.html"},
+      {name:"Prismatic Evolutions ETB/BB Bundle", value:"https://www.costco.com/.product.1898462.html"},
+      {name:"151 mini tins – 5 pack (set #1)", value:"https://www.costco.com/pokemon-scarlet-%26-violet---151-5-pack-mini-tins-machamp%2C-kadabra%2C-meowth%2C-slowpoke%2C-arcanine.product.4000297824.html"},
+      {name:"151 mini tins – 5 pack (set #2)", value:"https://www.costco.com/pokemon-scarlet-%26-violet---151-5-pack-mini-tins-electabuzz%2C-scyther%2C-magneton%2C-dragonite%2C-gengar.product.4000297877.html"},
+      {name:"PALDEAN FATES mini tins – 5 pack", value:"https://www.costco.com/pokemon-paldean-fates-5-pack-mini-tins-%2B-4-promo-cards.product.4000297876.html"},
+      {name:"151 ETB + Miraidon EX Tin + Koraidon EX Tin", value:"https://www.costco.com/pokemon-elite-trainer-box%3A-scarlet-%2526-violet-151-%2B-miraidon-ex-tin-%2B-koraidon-window-tin.product.4000283850.html"},
+      {name:"151 Alakazam EX + Zapdos EX box", value:"https://www.costco.com/pokemon-151-scarlet-%26-violet-ex-boxes---alakazam-%26-zapdos%2C-2-pack.product.4000241197.html"},
+      {name:"151 Ultra-Premium coll.", value:"https://www.costco.com/pok%C3%A9mon-scarlet-%2526-violet-series---151-ultra-premium-collection.product.4000271399.html"},
+    ]
+  },
+  {
+    store: "Sam’s Club",
+    items: [
+      {name:"PRISMATIC EVOLUTIONS Lucario Ex & Tyranitar Ex Premium Collection", value:"https://www.samsclub.com/ip/seot/17295401081"},
+      {name:"PRISMATIC EVOLUTIONS ETB + Poke Ball", value:"https://www.samsclub.com/p/pokemon-elite-trainer-box-poke-ball/P990425183"},
+      {name:"Poke Ball tin + 2 mini tins", value:"https://www.samsclub.com/p/pokemon-poke-ball-two-mini-tins/P990387658?xid=plp_product_2"},
+      {name:"Lucario V & Tyranitar V Heavy Hitters Premium coll.", value:"https://www.samsclub.com/p/pokemon-heavy-hitters-premium-collection/P03010010"},
+      {name:"Charizard EX Super-Premium coll.", value:"https://www.samsclub.com/p/pokemon-tcg-charizard-ex-super-premium-collection/P990402489?source=samsclub.com"},
+    ]
+  },
+];
 
-  function render(data){
-    host.innerHTML = "";
-    data.forEach((block, idx) => {
-      const det = document.createElement('details');
-      det.open = idx === 0; // open Best Buy by default
-      const sum = document.createElement('summary');
-      sum.textContent = block.store;
-      det.appendChild(sum);
+/* ===== Render sections with counts ===== */
+const host = document.getElementById('retailers');
+function formatStore(block){
+  const det = document.createElement('details');
+  det.open = block.store === "Best Buy"; // open first
+  const sum = document.createElement('summary');
+  const count = block.items.length;
+  sum.innerHTML = `<span>${block.store}</span><span class="badge">${count}</span>`;
+  det.appendChild(sum);
 
-      const list = document.createElement('div');
-      list.className = 'list';
-
-      block.items.forEach(it => {
-        const row = document.createElement('div');
-        row.className = 'sku' + (it.pending ? ' pending' : '');
-        row.dataset.sku = it.value || '';
-        row.innerHTML = `
-          <span class="name">${it.name}</span>
-          <span class="code">${it.value ? it.value : 'SKU pending'}</span>
-        `;
-        list.appendChild(row);
-      });
-
-      det.appendChild(list);
-      host.appendChild(det);
-    });
-  }
-  render(DATA);
-
-  // ====== COPY ===============================================================
-  function showToast(msg){
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(window.__toastTimer);
-    window.__toastTimer = setTimeout(()=>t.classList.remove('show'), 1400);
-  }
-
-  document.addEventListener('click', async (e) => {
-    const item = e.target.closest('.sku');
-    if (!item) return;
-    const val = (item.dataset.sku || '').trim();
-    if (!val){ showToast('No SKU yet'); return; }
-
-    try { await navigator.clipboard.writeText(val); }
-    catch {
-      const ta = document.createElement('textarea');
-      ta.value = val; ta.setAttribute('readonly',''); ta.style.position='absolute'; ta.style.left='-9999px';
-      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    }
-    showToast(`Copied: ${val}`);
+  const list = document.createElement('div'); list.className='list';
+  block.items.forEach(it=>{
+    const row = document.createElement('div');
+    row.className = 'sku' + (it.pending ? ' pending' : '');
+    row.dataset.sku = it.value || '';
+    row.innerHTML = `<span class="name">${it.name}</span>
+                     <span class="code">${it.value ? it.value : 'SKU pending'}</span>`;
+    list.appendChild(row);
   });
+  det.appendChild(list);
+  return det;
+}
+function render(data){ host.innerHTML=''; data.forEach(b=>host.appendChild(formatStore(b))); }
+render(DATA);
 
-  // ====== SEARCH =============================================================
-  const q = document.getElementById('search');
-  q.addEventListener('input', () => {
-    const term = q.value.trim().toLowerCase();
-    if (!term){ render(DATA); return; }
+/* ===== Copy to clipboard + toast ===== */
+const toast = document.getElementById('toast');
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>toast.classList.remove('show'), 1400);
+}
+document.addEventListener('click', async (e) => {
+  const item = e.target.closest('.sku'); if(!item) return;
+  const val = (item.dataset.sku || '').trim();
+  if (!val){ showToast('No SKU yet'); return; }
+  try { await navigator.clipboard.writeText(val); }
+  catch {
+    const ta = document.createElement('textarea');
+    ta.value = val; ta.setAttribute('readonly',''); ta.style.position='absolute'; ta.style.left='-9999px';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+  showToast(`Copied: ${val}`);
+});
 
-    const filtered = DATA.map(group => ({
-      store: group.store,
-      items: group.items.filter(it =>
-        it.name.toLowerCase().includes(term) || group.store.toLowerCase().includes(term)
-      )
-    })).filter(g => g.items.length);
-    render(filtered);
-  });
-  </script>
+/* ===== Live search ===== */
+const q = document.getElementById('search');
+q.addEventListener('input', () => {
+  const term = q.value.trim().toLowerCase();
+  if (!term){ render(DATA); return; }
+  const filtered = DATA.map(g=>({
+    store:g.store,
+    items:g.items.filter(it =>
+      it.name.toLowerCase().includes(term) || g.store.toLowerCase().includes(term))
+  })).filter(g=>g.items.length);
+  render(filtered);
+});
+</script>
 </body>
 </html>
+
 
